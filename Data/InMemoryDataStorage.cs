@@ -16,11 +16,13 @@ namespace TiqUtils.Data
             return newKey;
         }
 
-        public static T GetData<T>(string key)
+        public static T GetData<T>(string key, bool deleteData = true)
         {
-            if (Storage.ContainsKey(key))
-                return (T)Storage[key];
-            return default(T);
+            if (!Storage.ContainsKey(key)) return default(T);
+            var data = (T) Storage[key];
+            if (deleteData)
+                Storage.Remove(key);
+            return data;
         }
     }
 }

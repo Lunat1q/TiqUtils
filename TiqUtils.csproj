@@ -50,6 +50,7 @@
     <Compile Include="Conversion\Keys.cs" />
     <Compile Include="Conversion\Strings.cs" />
     <Compile Include="Conversion\Time.cs" />
+    <Compile Include="Data\InMemoryDataStorage.cs" />
     <Compile Include="Events\Controls\ControlsInput.cs" />
     <Compile Include="Network\Windows\Ldap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
