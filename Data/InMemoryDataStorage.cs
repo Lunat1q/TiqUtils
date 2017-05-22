@@ -7,7 +7,7 @@ namespace TiqUtils.Data
     {
         private static readonly Dictionary<string, object> Storage = new Dictionary<string, object>();
 
-        public static string Store<T>(T data)
+        public static string Store<T>(this T data)
         {
             var newKey = StringUtils.RandomString(16);
             if (Storage.ContainsKey(newKey))
