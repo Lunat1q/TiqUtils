@@ -7,7 +7,7 @@ namespace TiqUtils.Data
     {
         private static readonly Dictionary<string, object> Storage = new Dictionary<string, object>();
 
-        public static string Store<T>(T data)
+        public static string Store<T>(this T data)
         {
             var newKey = StringUtils.RandomString(16);
             if (Storage.ContainsKey(newKey))
@@ -18,11 +18,17 @@ namespace TiqUtils.Data
 
         public static T GetData<T>(string key, bool deleteData = true)
         {
-            if (!Storage.ContainsKey(key)) return default(T);
-            var data = (T) Storage[key];
+            if (string.IsNullOrEmpty(key) || !Storage.ContainsKey(key)) return default(T);
+            var data = (T)Storage[key];
             if (deleteData)
-                Storage.Remove(key);
+                ClearData(key);
             return data;
+        }
+
+        public static void ClearData(string key)
+        {
+            if (Storage.ContainsKey(key))
+                Storage.Remove(key);
         }
     }
 }
