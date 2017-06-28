@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace TiqUtils.TypeSpeccific
@@ -16,6 +17,20 @@ namespace TiqUtils.TypeSpeccific
               .Select(s => s[Random.Next(s.Length)]).ToArray());
         }
 
+        public static bool MatchPattern(this string text, string pattern)
+        {
+            var regex = new Regex(pattern);
+            var match = regex.Match(text);
+            return match.Success;
+        }
+
+        public static string GetByPattern(this string text, string pattern)
+        {
+            var regex = new Regex(pattern);
+            var match = regex.Match(text);
+            return match.Value;
+        }
+
         public static string RemoveUnwantedChars(this string input, char[] unwanted)
         {
             var builder = new StringBuilder(input.Length);
@@ -25,6 +40,11 @@ namespace TiqUtils.TypeSpeccific
                 builder.Append(t);
             }
             return builder.ToString();
+        }
+
+        public static string WrapTimeStamp(this string text)
+        {
+            return $"[{DateTime.Now:HH:mm}] {text}";
         }
 
         private static string Conversion(string str1, string str2)

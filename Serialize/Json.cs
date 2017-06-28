@@ -3,9 +3,9 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace TiqUtils.Serialize.Json
+namespace TiqUtils.Serialize
 {
-    public static class Serialize
+    public static class Json
     {
         public static bool SerializeDataJson<T>(this T data, string path, bool objectHandling = false)
         {
