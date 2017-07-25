@@ -32,7 +32,20 @@ namespace TiqUtils.Serialize
             }
         }
 
-        public static T DeserializeDataJson<T>(string path, bool objectHandling = false)
+        public static T DeserializeDataFromString<T>(string inputString)
+        {
+            try
+            {
+                var data = JsonConvert.DeserializeObject<T>(inputString);
+                return data;
+            }
+            catch (Exception)
+            {
+                return default(T);
+            }
+        }
+
+        public static T DeserializeDataFromFile<T>(string path, bool objectHandling = false)
         {
             if (!File.Exists(path))
                 return default(T);
