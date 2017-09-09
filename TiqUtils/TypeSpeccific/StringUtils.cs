@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace TiqUtils.TypeSpeccific
 {
@@ -15,6 +14,13 @@ namespace TiqUtils.TypeSpeccific
         {
             return new string(Enumerable.Repeat(chars, length)
               .Select(s => s[Random.Next(s.Length)]).ToArray());
+        }
+
+        public static IEnumerable<string> SplitByRows(this string text)
+        {
+            string[] splitChars = {"\r", "\r\n", "\r"};
+            var result = text.Split(splitChars, StringSplitOptions.RemoveEmptyEntries);
+            return result;
         }
 
         public static bool MatchPattern(this string text, string pattern)
