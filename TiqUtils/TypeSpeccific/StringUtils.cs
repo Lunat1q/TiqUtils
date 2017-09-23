@@ -23,6 +23,19 @@ namespace TiqUtils.TypeSpeccific
             return result;
         }
 
+        public static int GetNumbers(this string text)
+        {
+            var num = Regex.Match(text, @"\d+").Value;
+            int res;
+            int.TryParse(num, out res);
+            return res;
+        }
+
+        public static bool Empty(this string text)
+        {
+            return string.IsNullOrWhiteSpace(text);
+        }
+
         public static bool MatchPattern(this string text, string pattern)
         {
             var regex = new Regex(pattern);
@@ -120,6 +133,11 @@ namespace TiqUtils.TypeSpeccific
                     }
             }
             return false;
+        }
+
+        public static bool Contains(this string source, string toCheck, StringComparison comp)
+        {
+            return source.IndexOf(toCheck, comp) >= 0;
         }
     }
 }
