@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices.ComTypes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -32,7 +33,33 @@ namespace TiqUtils.Serialize
             }
         }
 
-        public static T DeserializeDataFromString<T>(string inputString)
+        public static string SerializeDataToString<T>(this T data, bool objectHandling = false)
+        {
+            try
+            {
+                var js = new JsonSerializer();
+                js.Converters.Add(new JavaScriptDateTimeConverter());
+                js.NullValueHandling = NullValueHandling.Ignore;
+                js.Formatting = Formatting.Indented;
+                if (objectHandling)
+                    js.TypeNameHandling = TypeNameHandling.Objects;
+
+                var ret = String.Empty;
+                using (StringWriter sw = new StringWriter())
+                {
+                    using (JsonWriter writer = new JsonTextWriter(sw))
+                        js.Serialize(writer, data);
+                    ret = sw.ToString();
+                }
+                return ret;
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+        }
+
+        public static T DeserializeDataFromString<T>(this string inputString)
         {
             try
             {
