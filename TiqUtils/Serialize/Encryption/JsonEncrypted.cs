@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using TiqUtils.Data;
 
 namespace TiqUtils.Serialize.Encryption
 {
@@ -32,10 +33,35 @@ namespace TiqUtils.Serialize.Encryption
             }
         }
 
-        public static T DeserializeFromStream<T>(Stream stream)
+        public static string CryptDataToBase64<T>(this T data, byte[] key)
         {
-            var serializer = new JsonSerializer { Formatting = Formatting.Indented };
+            try
+            {
+                if (data == null)
+                    throw new ArgumentNullException();
+
+                using (var memoryStream = new MemoryStream())
+                {
+                    SerializeToStream(memoryStream, data);
+                    var eKey = GetProper16Key(key);
+                    var iv = GetProper16Key(key, true);
+                    return Convert.ToBase64String(EncryptBytes(memoryStream.ToArray(), eKey, iv));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"Something went wrong: {ex.Message}");
+            }
+        }
+
+        private static T DeserializeFromStream<T>(Stream stream)
+        {
+            var serializer = new JsonSerializer { Formatting = Formatting.Indented};
             serializer.Converters.Add(new StringEnumConverter { CamelCaseText = true });
+            serializer.Error += (sender, args) =>
+            {
+                args.ErrorContext.Handled = true;
+            };
 
             using (var sr = new StreamReader(stream))
             using (var jsonTextReader = new JsonTextReader(sr))
@@ -44,7 +70,7 @@ namespace TiqUtils.Serialize.Encryption
             }
         }
 
-        public static void SerializeToStream(Stream stream, object data)
+        private static void SerializeToStream(Stream stream, object data)
         {
             var serializer = new JsonSerializer { Formatting = Formatting.Indented };
             serializer.Converters.Add(new StringEnumConverter { CamelCaseText = true });
@@ -56,17 +82,25 @@ namespace TiqUtils.Serialize.Encryption
             }
         }
 
-        public static T DecryptData<T>(string path, byte[] key)
+        public static T DecryptDataFromBase64<T>(string inputString, byte[] key)
         {
-            if (!File.Exists(path))
+            try
+            {
+                return DecryptBytes<T>(Convert.FromBase64String(inputString), key);
+            }
+            catch
+            {
                 return default(T);
+            }
+        }
 
+        private static T DecryptBytes<T>(byte[] data, byte[] key)
+        {
             try
             {
                 var eKey = GetProper16Key(key);
                 var iv = GetProper16Key(key, true);
-                var fileArray = File.ReadAllBytes(path);
-                using (var memoryStream = new MemoryStream(DecryptBytes(fileArray, eKey, iv)))
+                using (var memoryStream = new MemoryStream(DecryptBytes(data, eKey, iv)))
                 {
                     var obj = DeserializeFromStream<T>(memoryStream);
                     return obj;
@@ -79,11 +113,20 @@ namespace TiqUtils.Serialize.Encryption
             }
         }
 
+        public static T DecryptData<T>(string path, byte[] key)
+        {
+            if (!File.Exists(path))
+                return default(T);
+                
+            var fileArray = File.ReadAllBytes(path);
+            return DecryptBytes<T>(fileArray, key);
+        }
+
         #region CryptingZone
-        private static byte[] GetProper16Key(byte[] key, bool reverse = false)
+        internal static byte[] GetProper16Key(byte[] key, bool reverse = false)
         {
             if (key.Length >= 16)
-                return reverse ? key.Take(16).Reverse().ToArray() : key.Take(16).ToArray();
+                return reverse ? key.Reverse().Take(16).ToArray() : key.Take(16).ToArray();
             else
             {
                 var key16 = new byte[16];
@@ -112,6 +155,7 @@ namespace TiqUtils.Serialize.Encryption
                 return ms.ToArray();
             }
         }
+
         private static byte[] DecryptBytes(byte[] toDecrypt, byte[] key, byte[] iv)
         {
             using (var rmCrypto = new RijndaelManaged())

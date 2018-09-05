@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -32,16 +33,50 @@ namespace TiqUtils.Serialize
             }
         }
 
-        public static T DeserializeDataFromString<T>(string inputString)
+        public static T DeserializeDataFromString<T>(this string inputString, bool objectHandling = false)
         {
             try
             {
-                var data = JsonConvert.DeserializeObject<T>(inputString);
+                T data;
+                var serializer = new JsonSerializer();
+                if (objectHandling)
+                    serializer.TypeNameHandling = TypeNameHandling.Objects;
+
+                serializer.Converters.Add(new JavaScriptDateTimeConverter());
+                using (TextReader tr = new StringReader(inputString))
+                {
+                    using (JsonReader jsR = new JsonTextReader(tr))
+                    {
+                        data = serializer.Deserialize<T>(jsR);
+                    }
+                }
                 return data;
             }
             catch (Exception)
             {
                 return default(T);
+            }
+        }
+
+        public static string SerializeDataToString<T>(this T data, bool objectHandling = false)
+        {
+            try
+            {
+                var js = new JsonSerializer();
+                js.Converters.Add(new JavaScriptDateTimeConverter());
+                js.NullValueHandling = NullValueHandling.Ignore;
+                js.Formatting = Formatting.Indented;
+                if (objectHandling)
+                    js.TypeNameHandling = TypeNameHandling.Objects;
+                var sb = new StringBuilder();
+                using (StringWriter sw = new StringWriter(sb))
+                using (JsonWriter writer = new JsonTextWriter(sw))
+                    js.Serialize(writer, data);
+                return sb.ToString();
+            }
+            catch (Exception)
+            {
+                return string.Empty;
             }
         }
 

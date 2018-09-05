@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using TiqUtils.Serialize.Encryption;
 
 namespace TiqUtils.TypeSpeccific
 {
@@ -16,6 +17,19 @@ namespace TiqUtils.TypeSpeccific
               .Select(s => s[Random.Next(s.Length)]).ToArray());
         }
 
+        public static int CountEmoji(this string s)
+        {
+            const int maxAnsiCode = 255;
+
+            return s.Count(c => c > maxAnsiCode) / 2;
+        }
+        public static int CountAnsi(this string s)
+        {
+            const int maxAnsiCode = 255;
+
+            return s.Count(c => c <= maxAnsiCode);
+        }
+
         public static IEnumerable<string> SplitByRows(this string text)
         {
             string[] splitChars = {"\r", "\r\n", "\r"};
@@ -26,8 +40,7 @@ namespace TiqUtils.TypeSpeccific
         public static int GetNumbers(this string text)
         {
             var num = Regex.Match(text, @"\d+").Value;
-            int res;
-            int.TryParse(num, out res);
+            int.TryParse(num, out int res);
             return res;
         }
 
@@ -76,6 +89,43 @@ namespace TiqUtils.TypeSpeccific
             return str1;
         }
 
+        public static string DecryptData(this string data, byte[] key)
+        {
+            try
+            {
+                var eKey = JsonEncrypted.GetProper16Key(key);
+                var iv = JsonEncrypted.GetProper16Key(key, true);
+                var byteData = Convert.FromBase64String(data);
+                var decryptedBytes = byteData.Decrypt(eKey, iv);
+                return StringUtils.BytesToString(decryptedBytes);
+
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+        }
+
+        public static string CryptData(this string data, byte[] key)
+        {
+            try
+            {
+                if (data == null)
+                    throw new ArgumentNullException();
+
+
+                var dataBytes = data.ToBytes();
+                var eKey = JsonEncrypted.GetProper16Key(key);
+                var iv = JsonEncrypted.GetProper16Key(key, true);
+                return Convert.ToBase64String(dataBytes.Encrypt(eKey, iv), Base64FormattingOptions.InsertLineBreaks);
+
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"Something went wrong: {ex.Message}");
+            }
+        }
+
         public static bool GetVal<T>(this string value, out T resultVal) where T : IConvertible
         {
             resultVal = default(T);
@@ -85,11 +135,10 @@ namespace TiqUtils.TypeSpeccific
             {
                 case TypeCode.Double:
                     {
-                        double result;
                         var nfi = NumberFormatInfo.CurrentInfo;
                         var currentDecimalSeparator = nfi.CurrencyDecimalSeparator;
                         value = Conversion(value, currentDecimalSeparator);
-                        var res = double.TryParse(value, out result);
+                        var res = double.TryParse(value, out double result);
                         if (!res) return false;
                         var changeType = Convert.ChangeType(result, typeCode);
                         if (changeType != null)
@@ -98,11 +147,10 @@ namespace TiqUtils.TypeSpeccific
                     }
                 case TypeCode.Single:
                     {
-                        float result;
                         var nfi = NumberFormatInfo.CurrentInfo;
                         var currentDecimalSeparator = nfi.CurrencyDecimalSeparator;
                         value = Conversion(value, currentDecimalSeparator);
-                        var res = float.TryParse(value, out result);
+                        var res = float.TryParse(value, out float result);
                         if (!res) return false;
                         var changeType = Convert.ChangeType(result, typeCode);
                         if (changeType != null)
@@ -111,8 +159,7 @@ namespace TiqUtils.TypeSpeccific
                     }
                 case TypeCode.Int32:
                     {
-                        int result;
-                        var res = int.TryParse(value, NumberStyles.Any, CultureInfo.CurrentCulture, out result)
+                        var res = int.TryParse(value, NumberStyles.Any, CultureInfo.CurrentCulture, out int result)
                                   || int.TryParse(value, NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out result)
                                   || int.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
                         if (!res) return false;
@@ -123,8 +170,7 @@ namespace TiqUtils.TypeSpeccific
                     }
                 case TypeCode.Boolean:
                     {
-                        bool result;
-                        var res = bool.TryParse(value, out result);
+                        var res = bool.TryParse(value, out bool result);
                         if (!res) return false;
                         var changeType = Convert.ChangeType(result, typeCode);
                         if (changeType != null)
@@ -133,6 +179,26 @@ namespace TiqUtils.TypeSpeccific
                     }
             }
             return false;
+        }
+
+        public static string XoR(this string text, char key)
+        {
+            var result = new StringBuilder();
+
+            foreach (var t in text)
+                result.Append((char)(t ^ (uint)key));
+
+            return result.ToString();
+        }
+
+        public static byte[] ToBytes(this string data)
+        {
+            return Encoding.ASCII.GetBytes(data);
+        }
+
+        public static string BytesToString(byte[] data)
+        {
+            return Encoding.ASCII.GetString(data);
         }
 
         public static int ComputeStringDifference(this string s, string t, bool ignoreCase = false)
