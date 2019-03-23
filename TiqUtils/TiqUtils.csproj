@@ -58,6 +58,7 @@
     <Compile Include="Serialize\Encryption\ByteEncryption.cs" />
     <Compile Include="Serialize\Encryption\JsonEncrypted.cs" />
     <Compile Include="Serialize\Json.cs" />
+    <Compile Include="SettingsController\SettingsController.cs" />
     <Compile Include="TypeSpeccific\StringUtils.cs" />
     <Compile Include="Utils\Logging.cs" />
   </ItemGroup>
