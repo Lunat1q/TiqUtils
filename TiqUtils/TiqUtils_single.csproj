@@ -56,8 +56,8 @@
     <Compile Include="Serialize\Encryption\ByteEncryption.cs" />
     <Compile Include="Serialize\Encryption\JsonEncrypted.cs" />
     <Compile Include="Serialize\Json.cs" />
-    <Compile Include="TypeSpeccific\BoolUtils.cs" />
-    <Compile Include="TypeSpeccific\StringUtils.cs" />
+    <Compile Include="TypeSpecific\BoolUtils.cs" />
+    <Compile Include="TypeSpecific\StringUtils.cs" />
     <Compile Include="Utils\Logging.cs" />
   </ItemGroup>
   <ItemGroup>

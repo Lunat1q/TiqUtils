@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using TiqUtils.TypeSpeccific;
+using TiqUtils.TypeSpecific;
 
 namespace TiqUtils.Data
 {

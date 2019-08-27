@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using TiqUtils.Serialize.Encryption;
 
-namespace TiqUtils.TypeSpeccific
+namespace TiqUtils.TypeSpecific
 {
     public static class StringUtils
     {
