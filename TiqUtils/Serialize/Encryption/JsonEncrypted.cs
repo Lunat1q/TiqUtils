@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using TiqUtils.Data;
 
 namespace TiqUtils.Serialize.Encryption
@@ -57,7 +58,7 @@ namespace TiqUtils.Serialize.Encryption
         private static T DeserializeFromStream<T>(Stream stream)
         {
             var serializer = new JsonSerializer { Formatting = Formatting.Indented};
-            serializer.Converters.Add(new StringEnumConverter { CamelCaseText = true });
+            serializer.Converters.Add(new StringEnumConverter { NamingStrategy = new CamelCaseNamingStrategy() });
             serializer.Error += (sender, args) =>
             {
                 args.ErrorContext.Handled = true;
@@ -73,7 +74,7 @@ namespace TiqUtils.Serialize.Encryption
         private static void SerializeToStream(Stream stream, object data)
         {
             var serializer = new JsonSerializer { Formatting = Formatting.Indented };
-            serializer.Converters.Add(new StringEnumConverter { CamelCaseText = true });
+            serializer.Converters.Add(new StringEnumConverter { NamingStrategy = new CamelCaseNamingStrategy() });
 
             using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
             using (var jsonTextReader = new JsonTextWriter(sw))
