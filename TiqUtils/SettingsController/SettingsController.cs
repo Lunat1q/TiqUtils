@@ -12,32 +12,32 @@ namespace TiqUtils.SettingsController
 
         private string AssemblyDirectory { get; }
 
-        private string ConfigPath => Path.Combine(AssemblyDirectory, StorageFolder, ConfigFileName);
+        private string ConfigPath => Path.Combine(this.AssemblyDirectory, this.StorageFolder, this.ConfigFileName);
 
         public T Settings
         {
-            get => _settings ?? (_settings = Initialize());
-            private set => _settings = value;
+            get => this._settings ?? (this._settings = this.Initialize());
+            private set => this._settings = value;
         }
 
         public SettingsController(string assemblyDirectory)
         {
-            AssemblyDirectory = assemblyDirectory;
+            this.AssemblyDirectory = assemblyDirectory;
         }
 
         public T Initialize()
         {
-            return Json.DeserializeDataFromFile<T>(ConfigPath) ?? new T();
+            return Json.DeserializeDataFromFile<T>(this.ConfigPath) ?? new T();
         }
 
         public void Save()
         {
-            Settings.SerializeDataJson(ConfigPath);
+            this.Settings.SerializeDataJson(this.ConfigPath);
         }
 
         public void Reset()
         {
-            Settings = new T();
+            this.Settings = new T();
         }
     }
 }
