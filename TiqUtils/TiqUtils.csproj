@@ -22,13 +22,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" >
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2">
 		<HintPath Condition="Exists('..\packages\Newtonsoft.Json.12.0.2\lib\')">..\packages\Newtonsoft.Json.12.0.2\lib\netstandard1.3\Newtonsoft.Json.dll</HintPath>
 		<HintPath Condition="Exists('..\..\packages\Newtonsoft.Json.12.0.2\lib\')">..\..\packages\Newtonsoft.Json.12.0.2\lib\netstandard1.3\Newtonsoft.Json.dll</HintPath>
 	</PackageReference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.DirectoryServices.AccountManagement" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
