@@ -4,6 +4,10 @@
     <TargetFramework>netstandard2.0</TargetFramework>
 	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	<RepositoryUrl>https://github.com/Lunat1q/TiqUtils</RepositoryUrl>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+	<PackageProjectUrl>https://github.com/Lunat1q/TiqUtils</PackageProjectUrl>
+	<PackageOutputPath>.\AppPackages\</PackageOutputPath>
   </PropertyGroup> 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -27,6 +31,10 @@
     <PackageReference Include="System.Management" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\TiqUtils.Wpf\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
 </Project>
