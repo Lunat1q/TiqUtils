@@ -28,26 +28,6 @@ namespace TiqUtils.Utils
             return retVal;
         }
 
-        private static string Identifier(ManagementObjectCollection moc, string wmiProperty, string wmiMustBeTrue)
-        {
-            var result = "";
-            foreach (var mo in moc)
-            {
-                if (mo[wmiMustBeTrue].ToString() != "True") continue;
-                //Only get the first one
-                if (result != "") continue;
-                try
-                {
-                    result = mo[wmiProperty].ToString();
-                    break;
-                }
-                catch
-                {
-                }
-            }
-            return result;
-        }
-
         private static ManagementObjectCollection GetMoC(string wmiClass)
         {
             var mc = new System.Management.ManagementClass(wmiClass);
