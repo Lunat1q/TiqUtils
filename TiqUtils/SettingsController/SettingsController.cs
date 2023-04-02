@@ -5,6 +5,7 @@ namespace TiqUtils.SettingsController
 {
     public class SettingsController<T> where T: class, new()
     {
+        private readonly bool _objectsHandling;
         private T _settings;
         public string StorageFolder { get; set; } = "Config";
 
@@ -20,19 +21,20 @@ namespace TiqUtils.SettingsController
             private set => this._settings = value;
         }
 
-        public SettingsController(string assemblyDirectory)
+        public SettingsController(string assemblyDirectory, bool objectsHandling = false)
         {
+            this._objectsHandling = objectsHandling;
             this.AssemblyDirectory = assemblyDirectory;
         }
 
         public T Initialize()
         {
-            return Json.DeserializeDataFromFile<T>(this.ConfigPath) ?? new T();
+            return Json.DeserializeDataFromFile<T>(this.ConfigPath, this._objectsHandling) ?? new T();
         }
 
         public void Save()
         {
-            this.Settings.SerializeDataJson(this.ConfigPath);
+            this.Settings.SerializeDataJson(this.ConfigPath, this._objectsHandling);
         }
 
         public void Reset()
