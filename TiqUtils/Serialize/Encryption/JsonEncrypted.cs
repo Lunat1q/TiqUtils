@@ -55,6 +55,29 @@ namespace TiqUtils.Serialize.Encryption
             }
         }
 
+        public static void CryptDataIntoStream<T>(this T data, byte[] key, Stream targetStream)
+        {
+            try
+            {
+                if (data == null)
+                    throw new ArgumentNullException();
+
+                using (var memoryStream = new MemoryStream())
+                {
+                    SerializeToStream(memoryStream, data);
+                    var eKey = GetProper16Key(key);
+                    var iv = GetProper16Key(key, true);
+
+                    var encryptedBytes = EncryptBytes(memoryStream.ToArray(), eKey, iv);
+                    targetStream.Write(encryptedBytes, 0, encryptedBytes.Length);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"Something went wrong: {ex.Message}");
+            }
+        }
+
         private static T DeserializeFromStream<T>(Stream stream)
         {
             var serializer = new JsonSerializer { Formatting = Formatting.Indented};
@@ -88,6 +111,18 @@ namespace TiqUtils.Serialize.Encryption
             try
             {
                 return DecryptBytes<T>(Convert.FromBase64String(inputString), key);
+            }
+            catch
+            {
+                return default(T);
+            }
+        }
+
+        public static T DecryptDataFromBytes<T>(byte[] inputByteArray, byte[] key)
+        {
+            try
+            {
+                return DecryptBytes<T>(inputByteArray, key);
             }
             catch
             {
